@@ -1,0 +1,11 @@
+version: "2.4"
+services:
+  postgres:
+    image: postgres:11-alpine
+    environment:
+      - POSTGRES_USER=camunda
+      - POSTGRES_PASSWORD=camunda
+      - POSTGRES_DB=camunda
+    ports:
+      - "5432:5432"
+    mem_limit: 256M

@@ -1,0 +1,60 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.2.5.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+}
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    camundaSpringBootVersion = '3.4.1'
+    camundaEngineVersion = '7.12.0'
+    camundaSpinBomVersion = '1.8.0'
+    camundaAssertVersion = '5.0.0'
+    camundaTestCovergageVersion = '0.3.2'
+    jaxbVersion = '2.2.3'
+}
+
+dependencies {
+    // Camunda BOM
+    implementation platform("org.camunda.bpm:camunda-bom:$camundaEngineVersion")
+    implementation platform("org.camunda.spin:camunda-spin-bom:$camundaSpinBomVersion")
+
+    // Camunda
+    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:$camundaSpringBootVersion")
+    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest:$camundaSpringBootVersion")
+
+    // Spring boot plugins
+    implementation("org.springframework.boot:spring-boot-starter-jdbc") // Needed to use custom datasource url
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    // Camunda plugins
+    implementation("org.camunda.bpm:camunda-engine-plugin-spin")
+    implementation("org.camunda.spin:camunda-spin-dataformat-json-jackson")
+
+    // Camunda process definitions
+    implementation project(':processes')
+
+    // Database
+    implementation("com.h2database:h2")
+    implementation("org.postgresql:postgresql")
+
+    // JAXB
+    implementation("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
+
+    // Testing
+    testImplementation("org.camunda.bpm.extension:camunda-bpm-process-test-coverage:$camundaTestCovergageVersion")
+    testImplementation("org.camunda.bpm.assert:camunda-bpm-assert:$camundaAssertVersion")
+    testImplementation("org.assertj:assertj-core")
+}

@@ -1,0 +1,22 @@
+stages:
+  - build
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+build:
+  stage: build
+  image: openjdk:11-slim
+  script: gradle --build-cache build
+  cache:
+    key: "${CI_JOB_NAME}"
+    policy: pull-push
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    paths:
+      - target/process-test-coverage/

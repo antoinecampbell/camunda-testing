@@ -9,3 +9,7 @@
 
 # Coverage report
 target
+
+# Terraform
+.terraform
+*.tfstate*

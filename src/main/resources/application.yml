@@ -11,6 +11,9 @@ spring:
     url: jdbc:h2:./build/database/db;AUTO_SERVER=TRUE
     password:
 
+logging:
+  level:
+    com.antoinecampbell: debug
 ---
 
 spring:

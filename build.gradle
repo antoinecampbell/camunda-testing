@@ -24,6 +24,8 @@ ext {
     camundaAssertVersion = '5.0.0'
     camundaTestCovergageVersion = '0.3.2'
     jaxbVersion = '2.2.3'
+    awsSdkVersion = '2.11.12'
+    lombokVersion = '1.18.12'
 }
 
 dependencies {
@@ -38,6 +40,7 @@ dependencies {
     // Spring boot plugins
     implementation("org.springframework.boot:spring-boot-starter-jdbc") // Needed to use custom datasource url
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 
     // Camunda plugins
     implementation("org.camunda.bpm:camunda-engine-plugin-spin")
@@ -52,6 +55,17 @@ dependencies {
 
     // JAXB
     implementation("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
+
+    // AWS BOM
+    implementation platform("software.amazon.awssdk:bom:$awsSdkVersion")
+
+    // AWS SDK
+    implementation("software.amazon.awssdk:sqs")
+    implementation("software.amazon.awssdk:sns")
+
+    // Lombok
+    compileOnly("org.projectlombok:lombok:$lombokVersion")
+    annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
     // Testing
     testImplementation("org.camunda.bpm.extension:camunda-bpm-process-test-coverage:$camundaTestCovergageVersion")

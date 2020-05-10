@@ -9,4 +9,5 @@
 
 rootProject.name = 'camunda-testing'
 include 'processes'
+include 'node-external-service'
 

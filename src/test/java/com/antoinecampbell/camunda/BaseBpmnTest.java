@@ -14,7 +14,7 @@ public abstract class BaseBpmnTest {
     protected ProcessInstance processInstance;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         ProcessEngineRule rule = getRule();
         processEngine = rule.getProcessEngine();
         runtimeService = rule.getRuntimeService();

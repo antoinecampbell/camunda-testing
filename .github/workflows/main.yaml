@@ -25,6 +25,6 @@ jobs:
       - run: |
           ./gradlew api:build
       - uses: actions/upload-artifact@v2
-          with:
-            name: bpmn-coverage
-            path: target/process-test-coverage/
+        with:
+          name: bpmn-coverage
+          path: target/process-test-coverage/

@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.2.5.RELEASE'
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 }
 
@@ -18,8 +18,7 @@ repositories {
 }
 
 ext {
-    camundaSpringBootVersion = '3.4.1'
-    camundaEngineVersion = '7.12.0'
+    camundaEngineVersion = '7.13.0'
     camundaSpinBomVersion = '1.8.0'
     camundaAssertVersion = '5.0.0'
     camundaTestCovergageVersion = '0.3.2'
@@ -34,13 +33,14 @@ dependencies {
     implementation platform("org.camunda.spin:camunda-spin-bom:$camundaSpinBomVersion")
 
     // Camunda
-    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:$camundaSpringBootVersion")
-    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest:$camundaSpringBootVersion")
+    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:$camundaEngineVersion")
+    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest:$camundaEngineVersion")
 
     // Spring boot plugins
     implementation("org.springframework.boot:spring-boot-starter-jdbc") // Needed to use custom datasource url
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     // Camunda plugins
     implementation("org.camunda.bpm:camunda-engine-plugin-spin")

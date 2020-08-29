@@ -2,6 +2,7 @@ package com.antoinecampbell.camunda;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -16,6 +17,7 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 @EnableAsync
 @EnableScheduling
 @EnableJdbcRepositories
+@EnableConfigurationProperties
 public class Config {
 
     @Bean

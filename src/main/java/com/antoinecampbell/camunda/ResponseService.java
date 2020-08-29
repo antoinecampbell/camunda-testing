@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@ConditionalOnExpression("${com.antoinecampbell.camunda.enable-internal-services}")
 public class ResponseService {
 
     private final ExternalTaskService externalTaskService;
@@ -37,7 +39,7 @@ public class ResponseService {
                            ExternalTaskWorkerService externalTaskWorkerService,
                            ObjectMapper objectMapper,
                            SqsClient sqsClient,
-                           @Value("${aws.response.queue:none}") String responseQueueUrl) {
+                           @Value("${aws.response-queue:none}") String responseQueueUrl) {
         this.externalTaskService = externalTaskService;
         this.externalTaskRepository = externalTaskRepository;
         this.externalTaskWorkerService = externalTaskWorkerService;

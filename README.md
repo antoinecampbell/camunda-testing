@@ -2,5 +2,6 @@
 
 ## Setup
 Custom spring properties
-- aws.response.queue (SQS queue URL)
-- aws.task.topic (SNS topic ARN)
+- aws.response-queue (SQS queue URL)
+- aws.task-topic (SNS topic ARN)
+- com.antoinecampbell.camunda.enable-internal-services (Enable external task, and response services)

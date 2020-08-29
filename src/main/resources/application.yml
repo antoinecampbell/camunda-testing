@@ -5,15 +5,21 @@ camunda:
       password: admin
     database:
       type: h2
-
 spring:
   datasource:
     url: jdbc:h2:./build/database/db;AUTO_SERVER=TRUE
     password:
+  jersey:
+    application-path: /rest
+
 
 logging:
   level:
     com.antoinecampbell: debug
+com:
+  antoinecampbell:
+    camunda:
+      enable-internal-services: true
 ---
 
 spring:

@@ -10,6 +10,7 @@ import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,23 +24,21 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@ConditionalOnExpression("${com.antoinecampbell.camunda.enable-internal-services}")
 public class ExternalTaskWorkerService {
 
     private final ExternalTaskService externalTaskService;
-    private final ExternalTaskRepository externalTaskRepository;
     private final SnsClient snsClient;
     private final ObjectMapper objectMapper;
     private String externalTaskTopicArn;
     private final String responseQueueUrl;
 
     public ExternalTaskWorkerService(ExternalTaskService externalTaskService,
-                                     ExternalTaskRepository externalTaskRepository,
                                      ObjectMapper objectMapper,
                                      SnsClient snsClient,
-                                     @Value("${aws.task.topic:none}") String externalTaskTopicArn,
-                                     @Value("${aws.response.queue:none}") String responseQueueUrl) {
+                                     @Value("${aws.task-topic:none}") String externalTaskTopicArn,
+                                     @Value("${aws.response-queue:none}") String responseQueueUrl) {
         this.externalTaskService = externalTaskService;
-        this.externalTaskRepository = externalTaskRepository;
         this.objectMapper = objectMapper;
         this.snsClient = snsClient;
         this.externalTaskTopicArn = externalTaskTopicArn;
@@ -53,7 +52,7 @@ public class ExternalTaskWorkerService {
     @Async("externalTaskExecutor")
     public void processTasks() {
         // Fetch topics
-        List<String> availableTopics = externalTaskRepository.getAvailableTopics();
+        List<String> availableTopics = externalTaskService.getTopicNames(false, true, true);
         try {
             log.debug("Topics: {}",
                     objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(availableTopics));
@@ -109,11 +108,5 @@ public class ExternalTaskWorkerService {
                 .message(objectMapper.writeValueAsString(workflowMessage))
                 .messageAttributes(messageAttributes)
                 .build());
-    }
-
-    private Map<String, Object> convertVariables(Map<String, Object> variables) {
-        Map<String, Object> convertedVariables = new HashMap<>();
-
-        return convertedVariables;
     }
 }

@@ -23,7 +23,7 @@ jobs:
         with:
           java-version: 11
       - run: |
-          ./gradlew api:build
+          ./gradlew build
       - uses: actions/upload-artifact@v2
         with:
           name: bpmn-coverage

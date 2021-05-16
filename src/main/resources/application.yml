@@ -5,13 +5,23 @@ camunda:
       password: admin
     database:
       type: h2
+    authorization:
+      enabled: true
+
 spring:
   datasource:
     url: jdbc:h2:./build/database/db;AUTO_SERVER=TRUE
     password:
   jersey:
     application-path: /rest
-
+  security:
+    oauth2:
+      client:
+        registration:
+          azure:
+            client-id: PLACEHOLDER
+            client-secret: PLACEHOLDER
+            redirect-uri: http://localhost:8080/login/oauth2/code/azure
 
 logging:
   level:
@@ -20,6 +30,14 @@ com:
   antoinecampbell:
     camunda:
       enable-internal-services: true
+
+azure:
+  activedirectory:
+    tenant-id: PLACEHOLDER
+    active-directory-groups: camunda-admin
+#    user-group:
+#      allowed-groups: camunda-admin
+
 ---
 
 spring:

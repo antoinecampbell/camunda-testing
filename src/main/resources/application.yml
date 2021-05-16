@@ -5,13 +5,21 @@ camunda:
       password: admin
     database:
       type: h2
+    authorization:
+      enabled: true
+
 spring:
   datasource:
     url: jdbc:h2:./build/database/db;AUTO_SERVER=TRUE
     password:
   jersey:
     application-path: /rest
-
+  security:
+    oauth2:
+      client:
+        provider:
+          okta:
+            user-name-attribute: email
 
 logging:
   level:
@@ -19,7 +27,20 @@ logging:
 com:
   antoinecampbell:
     camunda:
-      enable-internal-services: true
+      enable-internal-services: false
+
+okta:
+  oauth2:
+    client-id: PALCEHOLDER
+    client-secret: PLACEHOLDER
+    issuer: PLACEHOLDER
+    post-logout-redirect-uri: /
+    redirect-uri: /authorization-code/callback
+    scopes:
+      - profile
+      - email
+      - openid
+      - groups
 ---
 
 spring:

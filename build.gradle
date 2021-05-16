@@ -6,8 +6,8 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.3.3.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'org.springframework.boot' version '2.4.5'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
 sourceCompatibility = 11
@@ -18,13 +18,15 @@ repositories {
 }
 
 ext {
-    camundaEngineVersion = '7.13.0'
-    camundaSpinBomVersion = '1.8.0'
+    camundaEngineVersion = '7.15.0'
+    camundaSpinBomVersion = '1.10.1'
     camundaAssertVersion = '5.0.0'
     camundaTestCovergageVersion = '0.3.2'
     jaxbVersion = '2.2.3'
     awsSdkVersion = '2.11.12'
     lombokVersion = '1.18.12'
+    azureVersion = '2.2.4'
+    oktaVersion = '2.0.1'
 }
 
 dependencies {
@@ -33,14 +35,22 @@ dependencies {
     implementation platform("org.camunda.spin:camunda-spin-bom:$camundaSpinBomVersion")
 
     // Camunda
-    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:$camundaEngineVersion")
-    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest:$camundaEngineVersion")
+    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp")
+    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest")
 
     // Spring boot plugins
     implementation("org.springframework.boot:spring-boot-starter-jdbc") // Needed to use custom datasource url
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    // Spring security
+    implementation("org.springframework.security:spring-security-oauth2-client")
+    implementation("org.springframework.security:spring-security-oauth2-jose")
+
+    // Okta Spring boot plugins
+    implementation("com.okta.spring:okta-spring-boot-starter:$oktaVersion")
 
     // Camunda plugins
     implementation("org.camunda.bpm:camunda-engine-plugin-spin")

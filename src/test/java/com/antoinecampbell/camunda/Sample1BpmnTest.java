@@ -23,7 +23,7 @@ public class Sample1BpmnTest extends BaseBpmnTest {
     }
 
     @Test
-    @Deployment(resources = "sample1.bpmn")
+    @Deployment(resources = "diagrams/sample1.bpmn")
     public void shouldCompleteProcess() {
         processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
         assertThat(processInstance).isStarted()

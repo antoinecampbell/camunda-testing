@@ -6,35 +6,51 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.3.3.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'org.springframework.boot' version '2.4.7'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
 sourceCompatibility = 11
 targetCompatibility = 11
 
+def isEnterprise = false
 repositories {
     mavenCentral()
+    if (isEnterprise) {
+        maven {
+            url = "https://camunda.jfrog.io/artifactory/camunda-bpm-ee"
+            credentials {
+                username = project.getProperty("artifactoryUsername")
+                password = project.getProperty("artifactoryToken")
+            }
+        }
+    }
 }
 
 ext {
-    camundaEngineVersion = '7.13.0'
-    camundaSpinBomVersion = '1.8.0'
-    camundaAssertVersion = '5.0.0'
-    camundaTestCovergageVersion = '0.3.2'
-    jaxbVersion = '2.2.3'
-    awsSdkVersion = '2.11.12'
-    lombokVersion = '1.18.12'
+    camundaEngineVersion = '7.16.0'
+    camundaEnterpriseVersion = '7.16.1-ee'
+    camundaAssertVersion = '10.0.0'
+    camundaTestCovergageVersion = '0.4.0'
+    jaxbVersion = '3.0.1'
+    awsSdkVersion = '2.17.138'
+    lombokVersion = '1.18.22'
 }
 
 dependencies {
     // Camunda BOM
     implementation platform("org.camunda.bpm:camunda-bom:$camundaEngineVersion")
-    implementation platform("org.camunda.spin:camunda-spin-bom:$camundaSpinBomVersion")
+    if (isEnterprise) {
+        implementation platform("org.camunda.bpm:camunda-bom:$camundaEnterpriseVersion")
+    }
 
     // Camunda
-    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:$camundaEngineVersion")
-    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest:$camundaEngineVersion")
+    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest")
+    if (isEnterprise) {
+        implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp-ee")
+    } else {
+        implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp")
+    }
 
     // Spring boot plugins
     implementation("org.springframework.boot:spring-boot-starter-jdbc") // Needed to use custom datasource url
@@ -44,10 +60,10 @@ dependencies {
 
     // Camunda plugins
     implementation("org.camunda.bpm:camunda-engine-plugin-spin")
-    implementation("org.camunda.spin:camunda-spin-dataformat-json-jackson")
+    implementation("org.camunda.spin:camunda-spin-dataformat-all")
 
-    // Camunda process definitions
-    implementation project(':processes')
+    // Groovy scripting
+    implementation("org.codehaus.groovy:groovy-all:3.0.8")
 
     // Database
     implementation("com.h2database:h2")

@@ -1,6 +1,6 @@
-package com.antoinecampbell.camunda;
+package com.antoinecampbell.camunda.listener;
 
-import com.antoinecampbell.camunda.external.task.ExternalTaskWorkerService;
+import com.antoinecampbell.camunda.task.ExternalTaskWorkerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

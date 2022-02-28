@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_exec" {
-  name = "ac-lambda-vpc-sqs"
+  name = "lambda-vpc-sqs-${var.function_name}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -17,7 +17,7 @@ EOF
 }
 
 resource "aws_iam_policy" "lambda_sqs" {
-  name = "ac-lambda-sqs"
+  name = "lambda-sqs-${var.function_name}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -30,9 +30,7 @@ resource "aws_iam_policy" "lambda_sqs" {
         "sqs:GetQueueAttributes",
         "sqs:SendMessage*"
       ],
-      "Resource": [
-        "*"
-      ]
+      "Resource": "*"
     }
   ]
 }

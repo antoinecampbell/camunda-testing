@@ -1,0 +1,8 @@
+POST http://localhost:8080/rest/process-definition/key/aws-test/start
+Content-Type: application/json
+
+{
+  "businessKey": "{{$uuid}}"
+}
+
+###

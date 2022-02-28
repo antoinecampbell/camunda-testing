@@ -1,4 +1,4 @@
-package com.antoinecampbell.camunda.external.task;
+package com.antoinecampbell.camunda.task;
 
 import com.antoinecampbell.camunda.Constants;
 import com.antoinecampbell.camunda.model.MessageType;
@@ -10,7 +10,7 @@ import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,13 +24,13 @@ import java.util.Map;
 
 @Service
 @Slf4j
-@ConditionalOnExpression("${com.antoinecampbell.camunda.enable-internal-services}")
+@ConditionalOnProperty("com.antoinecampbell.camunda.enable-internal-services")
 public class ExternalTaskWorkerService {
 
     private final ExternalTaskService externalTaskService;
     private final SnsClient snsClient;
     private final ObjectMapper objectMapper;
-    private String externalTaskTopicArn;
+    private final String externalTaskTopicArn;
     private final String responseQueueUrl;
 
     public ExternalTaskWorkerService(ExternalTaskService externalTaskService,
@@ -54,8 +54,7 @@ public class ExternalTaskWorkerService {
         // Fetch topics
         List<String> availableTopics = externalTaskService.getTopicNames(false, true, true);
         try {
-            log.debug("Topics: {}",
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(availableTopics));
+            log.debug("Topics: {}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(availableTopics));
             if (availableTopics.isEmpty()) {
                 log.debug("No tasks to send");
                 return;
@@ -64,6 +63,7 @@ public class ExternalTaskWorkerService {
             log.error("Error mapping list", e);
         }
 
+        // Fetch tasks for each topic
         ExternalTaskQueryBuilder externalTaskQueryBuilder =
                 externalTaskService.fetchAndLock(Constants.TASK_LOCK_COUNT, Constants.WORKER_NAME);
         for (String topic : availableTopics) {
@@ -71,8 +71,10 @@ public class ExternalTaskWorkerService {
         }
         List<LockedExternalTask> externalTasks = externalTaskQueryBuilder.execute();
         for (LockedExternalTask lockedExternalTask : externalTasks) {
+            // Send messages for each task to topic
             try {
                 sendMessage(lockedExternalTask.getTopicName(),
+                        lockedExternalTask.getId(),
                         lockedExternalTask.getBusinessKey(),
                         lockedExternalTask.getProcessDefinitionKey(),
                         lockedExternalTask.getVariables());
@@ -82,7 +84,7 @@ public class ExternalTaskWorkerService {
         }
     }
 
-    private void sendMessage(String topic, String businessKey, String workflow,
+    private void sendMessage(String topic, String taskId, String businessKey, String workflow,
                              Map<String, Object> variables) throws Exception {
         log.debug("Sending SNS message for topic: {}", topic);
         Map<String, MessageAttributeValue> messageAttributes = new HashMap<>();
@@ -96,6 +98,10 @@ public class ExternalTaskWorkerService {
                 .build());
         messageAttributes.put(Constants.ATTRIBUTE_REPLY_TO, MessageAttributeValue.builder()
                 .stringValue(responseQueueUrl)
+                .dataType("String")
+                .build());
+        messageAttributes.put(Constants.ATTRIBUTE_TASK_ID, MessageAttributeValue.builder()
+                .stringValue(taskId)
                 .dataType("String")
                 .build());
         WorkflowMessage workflowMessage = WorkflowMessage.builder()

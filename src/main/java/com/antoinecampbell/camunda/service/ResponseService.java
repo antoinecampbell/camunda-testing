@@ -1,15 +1,15 @@
-package com.antoinecampbell.camunda;
+package com.antoinecampbell.camunda.service;
 
-import com.antoinecampbell.camunda.external.task.ExternalTaskRepository;
-import com.antoinecampbell.camunda.external.task.ExternalTaskWorkerService;
+import com.antoinecampbell.camunda.Constants;
 import com.antoinecampbell.camunda.model.MessageType;
 import com.antoinecampbell.camunda.model.WorkflowMessage;
+import com.antoinecampbell.camunda.task.ExternalTaskWorkerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,24 +24,22 @@ import java.util.Map;
 
 @Service
 @Slf4j
-@ConditionalOnExpression("${com.antoinecampbell.camunda.enable-internal-services}")
+//@ConditionalOnExpression("${com.antoinecampbell.camunda.enable-internal-services}")
+@ConditionalOnProperty("com.antoinecampbell.camunda.enable-internal-services")
 public class ResponseService {
 
     private final ExternalTaskService externalTaskService;
-    private final ExternalTaskRepository externalTaskRepository;
     private final ExternalTaskWorkerService externalTaskWorkerService;
     private final ObjectMapper objectMapper;
     private final SqsClient sqsClient;
     private final String responseQueueUrl;
 
     public ResponseService(ExternalTaskService externalTaskService,
-                           ExternalTaskRepository externalTaskRepository,
                            ExternalTaskWorkerService externalTaskWorkerService,
                            ObjectMapper objectMapper,
                            SqsClient sqsClient,
                            @Value("${aws.response-queue:none}") String responseQueueUrl) {
         this.externalTaskService = externalTaskService;
-        this.externalTaskRepository = externalTaskRepository;
         this.externalTaskWorkerService = externalTaskWorkerService;
         this.objectMapper = objectMapper;
         this.sqsClient = sqsClient;
@@ -79,8 +77,8 @@ public class ResponseService {
                 MessageAttributeValue.builder().build()).stringValue());
         String routingKey = attributes.getOrDefault(Constants.ATTRIBUTE_ROUTING_KEY,
                 MessageAttributeValue.builder().build()).stringValue();
-        String externalTaskId = externalTaskRepository.getExternalTaskId(workflowMessage.getBusinessKey(),
-                routingKey);
+        String externalTaskId = attributes.getOrDefault(Constants.ATTRIBUTE_TASK_ID,
+                MessageAttributeValue.builder().build()).stringValue();
         log.debug("Message: {}", workflowMessage);
         log.debug("Type: {}", attributes.get(Constants.ATTRIBUTE_NAME_TYPE));
         log.debug("Success: {}", success);

@@ -4,6 +4,7 @@ public final class Constants {
 
     public static final String ATTRIBUTE_NAME_TYPE = "type";
     public static final String ATTRIBUTE_ROUTING_KEY = "routing-key";
+    public static final String ATTRIBUTE_TASK_ID = "task-id";
     public static final String ATTRIBUTE_REPLY_TO = "reply-to";
     public static final String ATTRIBUTE_ROUTING_SUCCESS = "success";
 

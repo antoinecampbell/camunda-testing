@@ -13,9 +13,8 @@ node {
     version = nodeVersion
     download = downloadNode
 }
-
 task buildZip(type: Zip) {
-    dependsOn npmInstall
+    dependsOn yarn_install
 
     from project.projectDir
     exclude "build/**"

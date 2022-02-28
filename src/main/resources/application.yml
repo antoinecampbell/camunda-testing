@@ -12,14 +12,9 @@ spring:
   jersey:
     application-path: /rest
 
-
 logging:
   level:
     com.antoinecampbell: debug
-com:
-  antoinecampbell:
-    camunda:
-      enable-internal-services: true
 ---
 
 spring:

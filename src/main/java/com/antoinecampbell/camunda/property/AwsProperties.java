@@ -14,4 +14,6 @@ public class AwsProperties {
 
     private String responseQueue;
     private String taskTopic;
+    private int responseQueueThreadCount = 1;
+    private int externalTaskThreadCount = 1;
 }

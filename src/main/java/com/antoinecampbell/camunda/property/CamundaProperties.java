@@ -12,5 +12,5 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class CamundaProperties {
 
-    private boolean enableInternalServices = true;
+    private boolean enableInternalServices = false;
 }

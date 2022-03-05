@@ -61,6 +61,7 @@ dependencies {
     // Camunda plugins
     implementation("org.camunda.bpm:camunda-engine-plugin-spin")
     implementation("org.camunda.spin:camunda-spin-dataformat-all")
+    implementation("org.camunda.bpm:camunda-engine-plugin-connect")
 
     // Groovy scripting
     implementation("org.codehaus.groovy:groovy-all:3.0.8")

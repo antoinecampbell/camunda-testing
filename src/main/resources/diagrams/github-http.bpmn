@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_14wu5eu" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.5.0">
+  <bpmn:process id="github-http" name="github-http" isExecutable="true" camunda:historyTimeToLive="P7D">
+    <bpmn:startEvent id="start" name="start">
+      <bpmn:outgoing>Flow_0wuli9k</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0wuli9k" sourceRef="start" targetRef="Gateway_1nh0blc" />
+    <bpmn:serviceTask id="search-repo-term-1" name="Search for term 1 repo">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">https://api.github.com/search/repositories?q=${term1}&amp;per_page=1</camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:outputParameter name="repo1">${S(response).prop("items").elements().get(0).prop("full_name").value()}</camunda:outputParameter>
+            <camunda:outputParameter name="stars1">${S(response).prop("items").elements().get(0).prop("stargazers_count").value()}</camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kjawx6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0lb1uun</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="end" name="end">
+      <bpmn:incoming>Flow_0tjnv1a</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="search-repo-term-2" name="Search for term 2 repo">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">https://api.github.com/search/repositories?q=${term2}&amp;per_page=1</camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:outputParameter name="repo2">${S(response).prop("items").elements().get(0).prop("full_name").value()}</camunda:outputParameter>
+            <camunda:outputParameter name="stars2">${S(response).prop("items").elements().get(0).prop("stargazers_count").value()}</camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1rb9nck</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zav81k</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0lb1uun" sourceRef="search-repo-term-1" targetRef="Gateway_1lrlf8m" />
+    <bpmn:sequenceFlow id="Flow_0zav81k" sourceRef="search-repo-term-2" targetRef="Gateway_1lrlf8m" />
+    <bpmn:sequenceFlow id="Flow_10nkipn" sourceRef="Gateway_1lrlf8m" targetRef="declare-popular-repo" />
+    <bpmn:scriptTask id="declare-popular-repo" name="Declare more popular repo" scriptFormat="groovy" camunda:resultVariable="popularRepo">
+      <bpmn:incoming>Flow_10nkipn</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tjnv1a</bpmn:outgoing>
+      <bpmn:script>if (stars1 &gt; stars2) {
+  repo1
+}  else {
+  repo2
+}</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0tjnv1a" sourceRef="declare-popular-repo" targetRef="end" />
+    <bpmn:parallelGateway id="Gateway_1nh0blc" name="split">
+      <bpmn:incoming>Flow_0wuli9k</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kjawx6</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1rb9nck</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_0kjawx6" sourceRef="Gateway_1nh0blc" targetRef="search-repo-term-1" />
+    <bpmn:sequenceFlow id="Flow_1rb9nck" sourceRef="Gateway_1nh0blc" targetRef="search-repo-term-2" />
+    <bpmn:parallelGateway id="Gateway_1lrlf8m" name="join">
+      <bpmn:incoming>Flow_0lb1uun</bpmn:incoming>
+      <bpmn:incoming>Flow_0zav81k</bpmn:incoming>
+      <bpmn:outgoing>Flow_10nkipn</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:textAnnotation id="TextAnnotation_1gcrwe3">
+      <bpmn:text>Input:
+- term1
+- term2</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0tb9wrx" sourceRef="start" targetRef="TextAnnotation_1gcrwe3" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="github-http">
+      <bpmndi:BPMNShape id="TextAnnotation_1gcrwe3_di" bpmnElement="TextAnnotation_1gcrwe3">
+        <dc:Bounds x="217" y="80" width="68" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0wuli9k_di" bpmnElement="Flow_0wuli9k">
+        <di:waypoint x="188" y="207" />
+        <di:waypoint x="255" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0lb1uun_di" bpmnElement="Flow_0lb1uun">
+        <di:waypoint x="480" y="140" />
+        <di:waypoint x="520" y="140" />
+        <di:waypoint x="520" y="207" />
+        <di:waypoint x="575" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zav81k_di" bpmnElement="Flow_0zav81k">
+        <di:waypoint x="480" y="290" />
+        <di:waypoint x="520" y="290" />
+        <di:waypoint x="520" y="207" />
+        <di:waypoint x="575" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10nkipn_di" bpmnElement="Flow_10nkipn">
+        <di:waypoint x="625" y="207" />
+        <di:waypoint x="670" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tjnv1a_di" bpmnElement="Flow_0tjnv1a">
+        <di:waypoint x="770" y="207" />
+        <di:waypoint x="822" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kjawx6_di" bpmnElement="Flow_0kjawx6">
+        <di:waypoint x="305" y="207" />
+        <di:waypoint x="340" y="207" />
+        <di:waypoint x="340" y="140" />
+        <di:waypoint x="380" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rb9nck_di" bpmnElement="Flow_1rb9nck">
+        <di:waypoint x="305" y="207" />
+        <di:waypoint x="340" y="207" />
+        <di:waypoint x="340" y="290" />
+        <di:waypoint x="380" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_1jaz2dj_di" bpmnElement="declare-popular-repo">
+        <dc:Bounds x="670" y="167" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_02rw8fw_di" bpmnElement="end">
+        <dc:Bounds x="822" y="189" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="831" y="232" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="start">
+        <dc:Bounds x="152" y="189" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="232" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1xhxopo_di" bpmnElement="Gateway_1nh0blc">
+        <dc:Bounds x="255" y="182" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="270" y="239" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_145iymk_di" bpmnElement="search-repo-term-1">
+        <dc:Bounds x="380" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_04nmf28_di" bpmnElement="search-repo-term-2">
+        <dc:Bounds x="380" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_04wx6g1_di" bpmnElement="Gateway_1lrlf8m">
+        <dc:Bounds x="575" y="182" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="592" y="239" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0tb9wrx_di" bpmnElement="Association_0tb9wrx">
+        <di:waypoint x="182" y="194" />
+        <di:waypoint x="233" y="134" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -20,7 +20,7 @@ variable "memory_size" {
   default = 128
 }
 variable "reserved_concurrent_executions" {
-  default = -1
+  default = 2
 }
 variable "tags" {
   type = map(string)
@@ -38,8 +38,8 @@ variable "batch_size" {
 
 locals {
   function_name = "${var.function_name}-${var.environment}"
-  input_queue = "${var.function_name}-input"
-  dead_letter_queue = "${var.function_name}-dead"
+  input_queue = "${var.function_name}-input-${var.environment}"
+  dead_letter_queue = "${var.function_name}-dead-${var.environment}"
   log_group = "/aws/lambda/${local.function_name}"
 }
 
@@ -80,9 +80,11 @@ resource "aws_sqs_queue_policy" "policy" {
     Version : "2012-10-17"
     Statement : [
       {
-        Sid : "allow-sns-send"
+        Sid : "AllowSnsSend"
         Effect : "Allow"
-        Principal : "*"
+        Principal : {
+          Service: "sns.amazonaws.com"
+        }
         Action : ["sqs:SendMessage"]
         Resource : aws_sqs_queue.input.arn
         Condition : {

@@ -17,6 +17,7 @@ task buildZip(type: Zip) {
     dependsOn yarn_install
 
     from project.projectDir
-    exclude "build/**"
+    include "node_modules/**"
+    include "index.js"
 }
 build.dependsOn buildZip

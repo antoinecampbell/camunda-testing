@@ -10,9 +10,15 @@ exports.handler = async function (event, context) {
     const messageAttributes = sqsEvent.messageAttributes;
     const replyQueue = messageAttributes['reply-to'].stringValue;
     console.log('Reply-to:', replyQueue);
+
     try {
-      const body = JSON.parse(sqsEvent.body);
+      const randomNumber = Math.floor(Math.random() * 10)
+      let body = JSON.parse(sqsEvent.body);
+      const outputName = body?.variables?.outputName || 'randomNumber'
+      body = Object.assign(body, {variables: {}})
+      body.variables[outputName] = randomNumber
       await sleep(200);
+
       const response = await sendResponse(replyQueue, body, messageAttributes, true);
       console.log('Response: ', response);
     } catch (e) {

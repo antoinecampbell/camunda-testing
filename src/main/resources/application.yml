@@ -3,12 +3,11 @@ camunda:
     admin-user:
       id: admin
       password: admin
-    database:
-      type: h2
 spring:
   datasource:
     url: jdbc:h2:./build/database/db;AUTO_SERVER=TRUE
     password:
+    driver-class-name: org.h2.Driver
   jersey:
     application-path: /rest
 

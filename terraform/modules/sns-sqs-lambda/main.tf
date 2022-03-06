@@ -35,6 +35,9 @@ variable "retention_in_days" {
 variable "batch_size" {
   default = 10
 }
+variable "alerts_enabled" {
+  default = false
+}
 
 locals {
   function_name = "${var.function_name}-${var.environment}"
@@ -83,7 +86,7 @@ resource "aws_sqs_queue_policy" "policy" {
         Sid : "AllowSnsSend"
         Effect : "Allow"
         Principal : {
-          Service: "sns.amazonaws.com"
+          Service : "sns.amazonaws.com"
         }
         Action : ["sqs:SendMessage"]
         Resource : aws_sqs_queue.input.arn
@@ -117,4 +120,36 @@ resource "aws_sns_topic_subscription" "sqs" {
   filter_policy = jsonencode({
     routing-key = [var.routing_key]
   })
+}
+
+resource "aws_cloudwatch_metric_alarm" "dead_letter_queue" {
+  alarm_name = aws_sqs_queue.dead.name
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods = 1
+  period = 60
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace = "AWS/SQS"
+  statistic = "Average"
+  threshold = 0
+
+  dimensions = {
+    QueueName : aws_sqs_queue.dead.name
+  }
+  count = var.alerts_enabled ? 1 : 0
+}
+
+resource "aws_cloudwatch_metric_alarm" "queue_delay" {
+  alarm_name = aws_sqs_queue.input.name
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods = 1
+  period = 60
+  metric_name = "ApproximateAgeOfOldestMessage"
+  namespace = "AWS/SQS"
+  statistic = "Average"
+  threshold = 60
+
+  dimensions = {
+    QueueName : aws_sqs_queue.dead.name
+  }
+  count = var.alerts_enabled ? 1 : 0
 }

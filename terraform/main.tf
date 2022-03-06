@@ -1,6 +1,9 @@
 variable "environment" {
   default = "test"
 }
+variable "alerts_enabled" {
+  default = false
+}
 
 locals {
   node_lambda_zip_location = "../node-external-service/build/distributions/node-external-service.zip"
@@ -52,6 +55,7 @@ module "service_1" {
   routing_key = "task1"
   tags = local.tags
   environment = var.environment
+  alerts_enabled = var.alerts_enabled
 }
 
 module "service_2" {
@@ -65,6 +69,7 @@ module "service_2" {
   routing_key = "task2"
   tags = local.tags
   environment = var.environment
+  alerts_enabled = var.alerts_enabled
 }
 
 module "service_3" {
@@ -78,6 +83,7 @@ module "service_3" {
   routing_key = "task3"
   tags = local.tags
   environment = var.environment
+  alerts_enabled = var.alerts_enabled
 }
 
 module "service_4" {
@@ -91,6 +97,7 @@ module "service_4" {
   routing_key = "task4"
   tags = local.tags
   environment = var.environment
+  alerts_enabled = var.alerts_enabled
 }
 
 module "service_5" {
@@ -104,6 +111,7 @@ module "service_5" {
   routing_key = "task5"
   tags = local.tags
   environment = var.environment
+  alerts_enabled = var.alerts_enabled
 }
 
 module "service_6" {
@@ -117,6 +125,7 @@ module "service_6" {
   routing_key = "task6"
   tags = local.tags
   environment = var.environment
+  alerts_enabled = var.alerts_enabled
 }
 
 module "service_7" {
@@ -130,6 +139,7 @@ module "service_7" {
   routing_key = "task7"
   tags = local.tags
   environment = var.environment
+  alerts_enabled = var.alerts_enabled
 }
 
 module "service_8" {
@@ -143,6 +153,7 @@ module "service_8" {
   routing_key = "task8"
   tags = local.tags
   environment = var.environment
+  alerts_enabled = var.alerts_enabled
 }
 
 module "service_9" {
@@ -156,6 +167,7 @@ module "service_9" {
   routing_key = "task9"
   tags = local.tags
   environment = var.environment
+  alerts_enabled = var.alerts_enabled
 }
 
 resource "aws_sns_topic" "external_task" {

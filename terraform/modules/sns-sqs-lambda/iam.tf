@@ -1,5 +1,10 @@
+locals {
+  role_name = "lambda-vpc-sqs-${local.function_name}"
+  policy_name = "lambda-sqs-${var.function_name}"
+}
+
 resource "aws_iam_role" "lambda_exec" {
-  name = "lambda-vpc-sqs-${local.function_name}"
+  name = local.role_name
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -14,10 +19,11 @@ resource "aws_iam_role" "lambda_exec" {
   ]
 }
 EOF
+  tags = merge(var.tags, { Name : local.role_name })
 }
 
 resource "aws_iam_policy" "lambda_sqs" {
-  name = "lambda-sqs-${var.function_name}"
+  name = local.policy_name
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -43,6 +49,7 @@ resource "aws_iam_policy" "lambda_sqs" {
   ]
 }
 EOF
+  tags = merge(var.tags, { Name : local.policy_name })
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_sqs" {

@@ -22,6 +22,7 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -102,7 +103,8 @@ public class ResponseService {
                     ExternalTask externalTask = externalTaskService.createExternalTaskQuery()
                             .externalTaskId(externalTaskId)
                             .singleResult();
-                    int remainingRetries = externalTask.getRetries();
+                    int remainingRetries = Optional.ofNullable(externalTask.getRetries())
+                            .orElse(Constants.EXTERNAL_TASK_RETRY_COUNT);
                     externalTaskService.handleFailure(externalTaskId,
                             Constants.WORKER_NAME,
                             workflowMessage.getError(),

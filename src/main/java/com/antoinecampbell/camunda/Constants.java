@@ -14,6 +14,9 @@ public final class Constants {
     public static final long TASK_POLL_MILLIS = 5_000L;
     public static final int TASK_LOCK_COUNT = 50;
 
+    public static final int EXTERNAL_TASK_RETRY_COUNT = 2;
+    public static final int EXTERNAL_TASK_RETRY_TIMEOUT_MILLIS = 3000;
+
     private Constants() {
     }
 }

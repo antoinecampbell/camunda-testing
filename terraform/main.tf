@@ -16,7 +16,7 @@ locals {
   topic = "external-task-${var.environment}"
   response_queue = "camunda-response-${var.environment}"
   dead_letter_queue = "camunda-response-dead-${var.environment}"
-  bucket_name = "camunda-testing-lambda-${var.environment}-${random_string.bucket_suffix.id}"
+  bucket_name = "camunda-testing-lambda-${random_string.bucket_suffix.id}-${var.environment}"
   file_hash = filebase64sha256(local.node_lambda_zip_location)
 }
 

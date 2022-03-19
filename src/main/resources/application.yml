@@ -3,6 +3,7 @@ camunda:
     admin-user:
       id: admin
       password: admin
+    default-number-of-retries: 2
 spring:
   datasource:
     url: jdbc:h2:./build/database/db;AUTO_SERVER=TRUE
@@ -17,7 +18,9 @@ logging:
 ---
 
 spring:
-  profiles: postgres
+  config:
+    activate:
+      on-profile: postgres
   datasource:
     url: jdbc:postgresql://localhost:5432/camunda
     username: camunda

@@ -3,6 +3,7 @@ package com.antoinecampbell.camunda.service;
 import com.antoinecampbell.camunda.Constants;
 import com.antoinecampbell.camunda.model.MessageType;
 import com.antoinecampbell.camunda.model.WorkflowMessage;
+import com.antoinecampbell.camunda.property.CamundaProperties;
 import com.antoinecampbell.camunda.task.ExternalTaskWorkerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,6 @@ import java.util.Map;
 
 @Service
 @Slf4j
-//@ConditionalOnExpression("${com.antoinecampbell.camunda.enable-internal-services}")
 @ConditionalOnProperty("com.antoinecampbell.camunda.enable-internal-services")
 public class ResponseService {
 
@@ -33,17 +33,20 @@ public class ResponseService {
     private final ObjectMapper objectMapper;
     private final SqsClient sqsClient;
     private final String responseQueueUrl;
+    private final CamundaProperties camundaProperties;
 
     public ResponseService(ExternalTaskService externalTaskService,
                            ExternalTaskWorkerService externalTaskWorkerService,
                            ObjectMapper objectMapper,
                            SqsClient sqsClient,
-                           @Value("${aws.response-queue:none}") String responseQueueUrl) {
+                           @Value("${aws.response-queue:none}") String responseQueueUrl,
+                           CamundaProperties camundaProperties) {
         this.externalTaskService = externalTaskService;
         this.externalTaskWorkerService = externalTaskWorkerService;
         this.objectMapper = objectMapper;
         this.sqsClient = sqsClient;
         this.responseQueueUrl = responseQueueUrl;
+        this.camundaProperties = camundaProperties;
 
         log.info("Queue: {}", responseQueueUrl);
     }
@@ -55,7 +58,7 @@ public class ResponseService {
             log.debug("Long-polling queue: {}", responseQueueUrl);
             ReceiveMessageRequest receiveMessageRequest = ReceiveMessageRequest.builder()
                     .queueUrl(responseQueueUrl)
-                    .maxNumberOfMessages(10)
+                    .maxNumberOfMessages(camundaProperties.getMaxReceiveMessageCount())
                     .messageAttributeNames("All")
                     .build();
             ReceiveMessageResponse receiveMessageResponse = sqsClient.receiveMessage(receiveMessageRequest);
@@ -69,7 +72,6 @@ public class ResponseService {
 
     private void handleMessage(Message message) throws Exception {
         log.debug(String.format("Message: %s", message.body()));
-        WorkflowMessage workflowMessage = objectMapper.readValue(message.body(), WorkflowMessage.class);
         Map<String, MessageAttributeValue> attributes = message.messageAttributes();
         MessageType type = MessageType.fromString(attributes.getOrDefault(Constants.ATTRIBUTE_NAME_TYPE,
                 MessageAttributeValue.builder().build()).stringValue());
@@ -79,6 +81,7 @@ public class ResponseService {
                 MessageAttributeValue.builder().build()).stringValue();
         String externalTaskId = attributes.getOrDefault(Constants.ATTRIBUTE_TASK_ID,
                 MessageAttributeValue.builder().build()).stringValue();
+        WorkflowMessage workflowMessage = objectMapper.readValue(message.body(), WorkflowMessage.class);
         log.debug("Message: {}", workflowMessage);
         log.debug("Type: {}", attributes.get(Constants.ATTRIBUTE_NAME_TYPE));
         log.debug("Success: {}", success);
@@ -99,11 +102,13 @@ public class ResponseService {
                     ExternalTask externalTask = externalTaskService.createExternalTaskQuery()
                             .externalTaskId(externalTaskId)
                             .singleResult();
+                    int remainingRetries = externalTask.getRetries();
                     externalTaskService.handleFailure(externalTaskId,
                             Constants.WORKER_NAME,
-                            "TODO: Error message",
-                            Math.max(0, externalTask.getRetries() - 1),
-                            3000);
+                            workflowMessage.getError(),
+                            workflowMessage.getErrorDescription(),
+                            Math.max(0, remainingRetries - 1),
+                            Constants.EXTERNAL_TASK_RETRY_TIMEOUT_MILLIS);
                 }
                 // Process external tasks
                 log.debug("Calling process tasks from ResponseService");

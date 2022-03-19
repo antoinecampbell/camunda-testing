@@ -1,7 +1,6 @@
 package com.antoinecampbell.camunda.config;
 
 import com.antoinecampbell.camunda.property.AwsProperties;
-import com.antoinecampbell.camunda.property.CamundaProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

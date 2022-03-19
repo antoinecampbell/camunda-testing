@@ -1,6 +1,6 @@
 locals {
-  role_name = "lambda-vpc-sqs-${local.function_name}"
-  policy_name = "lambda-sqs-${var.function_name}"
+  role_name = "lambda-vpc-sqs-${local.function_name}-${var.environment}"
+  policy_name = "lambda-sqs-${var.function_name}-${var.environment}"
 }
 
 resource "aws_iam_role" "lambda_exec" {

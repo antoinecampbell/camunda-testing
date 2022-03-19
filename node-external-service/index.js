@@ -18,13 +18,15 @@ exports.handler = async function (event, context) {
       body = Object.assign(body, {variables: {}})
       body.variables[outputName] = randomNumber
       await sleep(200);
+      if (randomNumber === 3) {
+        throw new Error('The random number was 3 🤷‍')
+      }
 
       const response = await sendResponse(replyQueue, body, messageAttributes, true);
       console.log('Response: ', response);
     } catch (e) {
       console.error(e);
-      await sendResponse(replyQueue, {error: {message: e.message}},
-          messageAttributes, false);
+      await sendResponse(replyQueue, {error: e.message, errorDescription: e.stack}, messageAttributes, false);
     }
   }
 };

@@ -12,5 +12,13 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class CamundaProperties {
 
+    /**
+     * Enables the ResponseService and ExternalTaskWorkerService when true.
+     */
     private boolean enableInternalServices = false;
+    /**
+     * Max number of messages to receive in a SQS receive message request.
+     * Valid values: 1 to 10
+     */
+    private int maxReceiveMessageCount = 10;
 }

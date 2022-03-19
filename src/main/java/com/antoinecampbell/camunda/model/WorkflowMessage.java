@@ -20,4 +20,6 @@ public class WorkflowMessage {
     private String businessKey;
     private String workflow;
     private Map<String, Object> variables;
+    private String error;
+    private String errorDescription;
 }

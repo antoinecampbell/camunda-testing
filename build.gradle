@@ -20,8 +20,8 @@ repositories {
         maven {
             url = "https://camunda.jfrog.io/artifactory/camunda-bpm-ee"
             credentials {
-                username = project.getProperty("artifactoryUsername")
-                password = project.getProperty("artifactoryToken")
+                username = project.getProperty("camundaRepoUsername")
+                password = project.getProperty("camundaRepoPassword")
             }
         }
     }

@@ -89,3 +89,7 @@ dependencies {
     testImplementation("org.camunda.bpm.assert:camunda-bpm-assert:$camundaAssertVersion")
     testImplementation("org.assertj:assertj-core")
 }
+
+clean {
+    delete "$projectDir/target"
+}

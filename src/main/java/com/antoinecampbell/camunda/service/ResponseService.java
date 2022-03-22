@@ -60,6 +60,7 @@ public class ResponseService {
             ReceiveMessageRequest receiveMessageRequest = ReceiveMessageRequest.builder()
                     .queueUrl(responseQueueUrl)
                     .maxNumberOfMessages(camundaProperties.getMaxReceiveMessageCount())
+                    .waitTimeSeconds(20)
                     .messageAttributeNames("All")
                     .build();
             ReceiveMessageResponse receiveMessageResponse = sqsClient.receiveMessage(receiveMessageRequest);

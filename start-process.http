@@ -1,3 +1,23 @@
+# Start Github BPMN
+POST http://localhost:8080/rest/process-definition/key/github-http/start
+Content-Type: application/json
+
+{
+  "businessKey": "{{$uuid}}",
+  "variables": {
+    "term1": {
+      "value": "rust"
+    },
+    "term2": {
+      "value": "go"
+    }
+  },
+  "withVariablesInReturn": true
+}
+
+
+###
+# Start AWS BPMN
 POST http://localhost:8080/rest/process-definition/key/aws-test/start
 Content-Type: application/json
 

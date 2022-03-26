@@ -1,6 +1,6 @@
 locals {
-  role_name = "lambda-vpc-sqs-${local.function_name}-${var.environment}"
-  policy_name = "lambda-sqs-${var.function_name}-${var.environment}"
+  role_name = "lambda-vpc-sqs-${local.function_name}"
+  policy_name = "lambda-sqs-${var.function_name}"
 }
 
 resource "aws_iam_role" "lambda_exec" {
@@ -60,4 +60,9 @@ resource "aws_iam_role_policy_attachment" "lambda_sqs" {
 resource "aws_iam_role_policy_attachment" "lambda" {
   role = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "xray" {
+  role = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
 }

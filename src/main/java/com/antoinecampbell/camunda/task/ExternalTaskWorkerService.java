@@ -3,7 +3,6 @@ package com.antoinecampbell.camunda.task;
 import com.antoinecampbell.camunda.Constants;
 import com.antoinecampbell.camunda.model.MessageType;
 import com.antoinecampbell.camunda.model.WorkflowMessage;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ExternalTaskService;
@@ -53,14 +52,10 @@ public class ExternalTaskWorkerService {
     public void processTasks() {
         // Fetch topics
         List<String> availableTopics = externalTaskService.getTopicNames(false, true, true);
-        try {
-            log.debug("Topics: {}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(availableTopics));
-            if (availableTopics.isEmpty()) {
-                log.debug("No tasks to send");
-                return;
-            }
-        } catch (JsonProcessingException e) {
-            log.error("Error mapping list", e);
+        log.debug("Topics: {}", availableTopics);
+        if (availableTopics.isEmpty()) {
+            log.debug("No tasks to send");
+            return;
         }
 
         // Fetch tasks for each topic
@@ -68,18 +63,18 @@ public class ExternalTaskWorkerService {
                 externalTaskService.fetchAndLock(Constants.TASK_LOCK_COUNT, Constants.WORKER_NAME);
         for (String topic : availableTopics) {
             externalTaskQueryBuilder.topic(topic, Constants.TASK_TIMEOUT_MILLIS);
-        }
-        List<LockedExternalTask> externalTasks = externalTaskQueryBuilder.execute();
-        for (LockedExternalTask lockedExternalTask : externalTasks) {
-            // Send messages for each task to topic
-            try {
-                sendMessage(lockedExternalTask.getTopicName(),
-                        lockedExternalTask.getId(),
-                        lockedExternalTask.getBusinessKey(),
-                        lockedExternalTask.getProcessDefinitionKey(),
-                        lockedExternalTask.getVariables());
-            } catch (Exception e) {
-                log.error("Error sending SQS message", e);
+            List<LockedExternalTask> externalTasks = externalTaskQueryBuilder.execute();
+            // Send messages for each task to the SNS topic
+            for (LockedExternalTask lockedExternalTask : externalTasks) {
+                try {
+                    sendMessage(lockedExternalTask.getTopicName(),
+                            lockedExternalTask.getId(),
+                            lockedExternalTask.getBusinessKey(),
+                            lockedExternalTask.getProcessDefinitionKey(),
+                            lockedExternalTask.getVariables());
+                } catch (Exception e) {
+                    log.error("Error sending SQS message", e);
+                }
             }
         }
     }

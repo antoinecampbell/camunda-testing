@@ -48,6 +48,7 @@ locals {
   input_queue = "${var.function_name}-input-${var.environment}"
   dead_letter_queue = "${var.function_name}-dead-${var.environment}"
   log_group = "/aws/lambda/${local.function_name}"
+  tracing_mode = var.tracing_enabled ? "Active" : "PassThrough"
 }
 
 resource "aws_lambda_function" "lambda" {
@@ -63,11 +64,8 @@ resource "aws_lambda_function" "lambda" {
   timeout = var.timeout
   memory_size = var.memory_size
   reserved_concurrent_executions = var.reserved_concurrent_executions
-  dynamic "tracing_config" {
-    for_each = var.tracing_enabled ? [1] : []
-    content {
-      mode = "Active"
-    }
+  tracing_config {
+    mode = local.tracing_mode
   }
   tags = merge(var.tags, { Name : local.function_name })
 }

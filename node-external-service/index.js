@@ -1,7 +1,8 @@
+const AWSXRay = require('aws-xray-sdk');
 const {SQSClient, SendMessageCommand} = require('@aws-sdk/client-sqs');
 
 const region = process.env['AWS_REGION'] || 'us-east-1'
-const sqsClient = new SQSClient({region})
+const sqsClient = AWSXRay.captureAWSv3Client(new SQSClient({region}));
 
 exports.handler = async function (event, context) {
   console.log('Event:', JSON.stringify(event));
@@ -17,7 +18,9 @@ exports.handler = async function (event, context) {
       const outputName = body?.variables?.outputName || 'randomNumber'
       body = Object.assign(body, {variables: {}})
       body.variables[outputName] = randomNumber
-      await sleep(200);
+      const sleepSegment = AWSXRay.getSegment().addNewSubsegment('sleep');
+      await sleep(200)
+      sleepSegment.close()
       if (randomNumber === 3) {
         throw new Error('The random number was 3 🤷‍')
       }

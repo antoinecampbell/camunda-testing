@@ -38,6 +38,10 @@ variable "batch_size" {
 variable "alerts_enabled" {
   default = false
 }
+variable "tracing_enabled" {
+  type = bool
+  default = false
+}
 
 locals {
   function_name = "${var.function_name}-${var.environment}"
@@ -59,6 +63,12 @@ resource "aws_lambda_function" "lambda" {
   timeout = var.timeout
   memory_size = var.memory_size
   reserved_concurrent_executions = var.reserved_concurrent_executions
+  dynamic "tracing_config" {
+    for_each = var.tracing_enabled ? [1] : []
+    content {
+      mode = "Active"
+    }
+  }
   tags = merge(var.tags, { Name : local.function_name })
 }
 

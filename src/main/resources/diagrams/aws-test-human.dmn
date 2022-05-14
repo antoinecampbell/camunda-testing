@@ -11,7 +11,7 @@
       <rule id="DecisionRule_06bc6cu">
         <description>Assign task to the legal team</description>
         <inputEntry id="UnaryTests_0codtwr">
-          <text>&gt; 5</text>
+          <text>&gt;= 8</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_0ahi0yc">
           <text>"legal"</text>

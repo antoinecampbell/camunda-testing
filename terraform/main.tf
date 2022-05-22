@@ -4,6 +4,12 @@ variable "environment" {
 variable "alerts_enabled" {
   default = false
 }
+variable "tracing_enabled" {
+  default = true
+}
+variable "number_of_services" {
+  default = 9
+}
 
 locals {
   node_lambda_zip_location = "../node-external-service/build/distributions/node-external-service.zip"
@@ -52,130 +58,20 @@ resource "aws_s3_object" "lambda_zip" {
   tags = local.tags
 }
 
-module "service_1" {
+module "lambda_services" {
   source = "./modules/sns-sqs-lambda"
 
-  function_name = "external-task-service-1"
+  count = var.number_of_services
+  function_name = "external-task-service-${count.index + 1}"
   s3_bucket = aws_s3_bucket.lambda.id
   s3_key = aws_s3_object.lambda_zip.id
   file_hash = local.file_hash
   topic_arn = aws_sns_topic.external_task.arn
-  routing_key = "task1"
+  routing_key = "task${count.index + 1}"
   tags = local.tags
   environment = var.environment
   alerts_enabled = var.alerts_enabled
-}
-
-module "service_2" {
-  source = "./modules/sns-sqs-lambda"
-
-  function_name = "external-task-service-2"
-  s3_bucket = aws_s3_bucket.lambda.id
-  s3_key = aws_s3_object.lambda_zip.id
-  file_hash = local.file_hash
-  topic_arn = aws_sns_topic.external_task.arn
-  routing_key = "task2"
-  tags = local.tags
-  environment = var.environment
-  alerts_enabled = var.alerts_enabled
-}
-
-module "service_3" {
-  source = "./modules/sns-sqs-lambda"
-
-  function_name = "external-task-service-3"
-  s3_bucket = aws_s3_bucket.lambda.id
-  s3_key = aws_s3_object.lambda_zip.id
-  file_hash = local.file_hash
-  topic_arn = aws_sns_topic.external_task.arn
-  routing_key = "task3"
-  tags = local.tags
-  environment = var.environment
-  alerts_enabled = var.alerts_enabled
-}
-
-module "service_4" {
-  source = "./modules/sns-sqs-lambda"
-
-  function_name = "external-task-service-4"
-  s3_bucket = aws_s3_bucket.lambda.id
-  s3_key = aws_s3_object.lambda_zip.id
-  file_hash = local.file_hash
-  topic_arn = aws_sns_topic.external_task.arn
-  routing_key = "task4"
-  tags = local.tags
-  environment = var.environment
-  alerts_enabled = var.alerts_enabled
-}
-
-module "service_5" {
-  source = "./modules/sns-sqs-lambda"
-
-  function_name = "external-task-service-5"
-  s3_bucket = aws_s3_bucket.lambda.id
-  s3_key = aws_s3_object.lambda_zip.id
-  file_hash = local.file_hash
-  topic_arn = aws_sns_topic.external_task.arn
-  routing_key = "task5"
-  tags = local.tags
-  environment = var.environment
-  alerts_enabled = var.alerts_enabled
-}
-
-module "service_6" {
-  source = "./modules/sns-sqs-lambda"
-
-  function_name = "external-task-service-6"
-  s3_bucket = aws_s3_bucket.lambda.id
-  s3_key = aws_s3_object.lambda_zip.id
-  file_hash = local.file_hash
-  topic_arn = aws_sns_topic.external_task.arn
-  routing_key = "task6"
-  tags = local.tags
-  environment = var.environment
-  alerts_enabled = var.alerts_enabled
-}
-
-module "service_7" {
-  source = "./modules/sns-sqs-lambda"
-
-  function_name = "external-task-service-7"
-  s3_bucket = aws_s3_bucket.lambda.id
-  s3_key = aws_s3_object.lambda_zip.id
-  file_hash = local.file_hash
-  topic_arn = aws_sns_topic.external_task.arn
-  routing_key = "task7"
-  tags = local.tags
-  environment = var.environment
-  alerts_enabled = var.alerts_enabled
-}
-
-module "service_8" {
-  source = "./modules/sns-sqs-lambda"
-
-  function_name = "external-task-service-8"
-  s3_bucket = aws_s3_bucket.lambda.id
-  s3_key = aws_s3_object.lambda_zip.id
-  file_hash = local.file_hash
-  topic_arn = aws_sns_topic.external_task.arn
-  routing_key = "task8"
-  tags = local.tags
-  environment = var.environment
-  alerts_enabled = var.alerts_enabled
-}
-
-module "service_9" {
-  source = "./modules/sns-sqs-lambda"
-
-  function_name = "external-task-service-9"
-  s3_bucket = aws_s3_bucket.lambda.id
-  s3_key = aws_s3_object.lambda_zip.id
-  file_hash = local.file_hash
-  topic_arn = aws_sns_topic.external_task.arn
-  routing_key = "task9"
-  tags = local.tags
-  environment = var.environment
-  alerts_enabled = var.alerts_enabled
+  tracing_enabled = var.tracing_enabled
 }
 
 resource "aws_sns_topic" "external_task" {

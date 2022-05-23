@@ -1,5 +1,7 @@
 # camunda-testing
 
+![Alt Architecture Diagram](./images/aws-architecture-camunda-testing.png)
+
 ## Setup
 Custom spring properties
 - aws.response-queue (SQS queue URL)
